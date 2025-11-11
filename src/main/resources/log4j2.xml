@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" monitorInterval="60">
+
+  <Properties>
+    <!-- 日志目录 -->
+    <Property name="LOG_HOME">logs</Property>
+  </Properties>
+
+  <Appenders>
+
+    <!-- 控制台输出 -->
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
+    </Console>
+
+    <!-- tcp-server 日志文件 -->
+    <RollingFile
+      name="TcpServerFile"
+      fileName="${LOG_HOME}/tcp-server.log"
+      filePattern="${LOG_HOME}/archive/tcp-server-%d{yyyy-MM-dd}.log">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="10MB"/>
+      </Policies>
+    </RollingFile>
+
+    <!-- tcp-client 日志文件 -->
+    <RollingFile
+      name="TcpClientFile"
+      fileName="${LOG_HOME}/tcp-client.log"
+      filePattern="${LOG_HOME}/archive/tcp-client-%d{yyyy-MM-dd}.log">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="10MB"/>
+      </Policies>
+    </RollingFile>
+
+    <!-- upd 日志文件 -->
+    <RollingFile
+      name="UpdFile"
+      fileName="${LOG_HOME}/upd.log"
+      filePattern="${LOG_HOME}/archive/upd-%d{yyyy-MM-dd}.log">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="10MB"/>
+      </Policies>
+    </RollingFile>
+
+    <!-- 默认日志文件（无 topic 时使用） -->
+    <RollingFile
+      name="DefaultFile"
+      fileName="${LOG_HOME}/app.log"
+      filePattern="${LOG_HOME}/archive/app-%d{yyyy-MM-dd}.log">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="10MB"/>
+      </Policies>
+    </RollingFile>
+
+  </Appenders>
+
+  <Loggers>
+
+    <!-- tcp-server logger -->
+    <Logger name="tcp-server" level="INFO" additivity="false">
+<!--      <AppenderRef ref="Console"/>-->
+      <AppenderRef ref="TcpServerFile"/>
+    </Logger>
+
+    <!-- tcp-client logger -->
+    <Logger name="tcp-client" level="INFO" additivity="false">
+<!--      <AppenderRef ref="Console"/>-->
+      <AppenderRef ref="TcpClientFile"/>
+    </Logger>
+
+    <!-- upd logger -->
+    <Logger name="upd" level="INFO" additivity="false">
+<!--      <AppenderRef ref="Console"/>-->
+      <AppenderRef ref="UpdFile"/>
+    </Logger>
+
+    <!-- 根日志，默认输出到控制台 + app.log -->
+    <Root level="INFO">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="DefaultFile"/>
+    </Root>
+
+  </Loggers>
+
+</Configuration>
