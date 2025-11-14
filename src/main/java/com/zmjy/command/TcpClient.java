@@ -2,12 +2,17 @@ package com.zmjy.command;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import java.net.InetSocketAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -18,13 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "tcp-client")
 public class TcpClient {
 
-    //油机节点
-    private byte remoteNode = 1 & 0xFF;
-    private byte remoteSubNode = 11 & 0xFF;
-
-    //本机节点
-    private byte localNode = 3 & 0xFF;
-    private byte localSubNode = 4 & 0xFF;
+    public static void main(String[] args) throws InterruptedException {
+        TcpClient tcpClient = new TcpClient();
+        tcpClient.tpcClient("192.168.4.230", 8767);
+        ByteBuf buffer = Unpooled.buffer();
+        buffer.writeBytes(new byte[]{01, 01});
+        tcpClient.send(buffer, "hello world");
+    }
 
     //用于构建token,线程安全的int
     private static final AtomicInteger token = new AtomicInteger(1);
@@ -32,7 +37,7 @@ public class TcpClient {
     private volatile boolean running = true;
 
     public TcpClient() {
-        this.intervalMillis = 3000;
+        this.intervalMillis = 1500;
         startWorker();
     }
 
@@ -49,7 +54,7 @@ public class TcpClient {
         bootstrap.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel ch) {
-
+                ch.pipeline().addLast(new Handle());
             }
         });
         ChannelFuture future = bootstrap.connect(ip, port);
@@ -59,12 +64,20 @@ public class TcpClient {
             throw new RuntimeException("tcp-client服务连接超时");
         } else {
             if (future.isSuccess()) {
-                log.info("服务启动成功");
+                log.info("服务启动成功: {}", ip + ":" + port);
                 channel = future.channel();
             } else {
-                log.info("服务启动失败");
+                log.info("服务启动失败: {}", ip + ":" + port);
                 throw new RuntimeException("tcp-client服务启动失败");
             }
+        }
+    }
+
+    public class Handle extends ChannelInboundHandlerAdapter {
+        @Override
+        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            log.info("接收到主动数据:{}", MsgUtil.bytesToHex((ByteBuf) msg));
+            super.channelRead(ctx, msg);
         }
     }
 
@@ -126,6 +139,7 @@ public class TcpClient {
     }
 
     private static class MessageWrapper {
+
         final ByteBuf buf;
         final String msg;
 

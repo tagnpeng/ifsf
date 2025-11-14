@@ -19,6 +19,16 @@ public enum FpIdEnums {
     FP_State((byte) 0x14),
     //允许读取所有逻辑油枪的状态（Log_Noz_State）
     Log_Noz_State((byte) 0x15),
+    //授权或预授权来启动一个交易（Release_FP）
+    Release_FP((byte) 0x3E),
+    //为运行的加油交易指定序列号（Current_TR_Seq_Nb）
+    Current_TR_Seq_Nb((byte) 0x1D),
+    //描述未支付交易数（Nb_Tran_Buffer_Not_Paid）
+    Nb_Tran_Buffer_Not_Paid((byte) 0x02),
+    //为运行的交易指定释放 FP 的控制器（Release_Contr_Id）
+    Release_Contr_Id((byte) 0x1E),
+    //这顶运行交易发送消息的频率，以10秒为单位 (0 = 未激活 1-999 = 以十秒为单位的延迟。例如：2代表有20秒的间隔)
+    Running_Transaction_Message_Frequency((byte) 0x3B),
     ;
 
     @Getter

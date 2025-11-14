@@ -1,5 +1,7 @@
-package com.zmjy.command;
+package com.zmjy.command.test;
 
+import com.zmjy.command.Cache;
+import com.zmjy.command.MsgUtil;
 import com.zmjy.command.dto.enums.ErrorCode;
 import com.zmjy.command.dto.enums.FpStatusEnums;
 import com.zmjy.command.dto.enums.MsgType;
@@ -18,8 +20,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.unix.Buffer;
-import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class TcpServer {
             throw new RuntimeException("tcp-server服务连接超时");
         } else {
             if (future.isSuccess()) {
-                log.info("服务启动成功:{}", localIp + ":" + port);
+                log.info("服务启动成功");
                 channel = future.channel();
             } else {
                 log.info("服务启动失败", future.cause());
@@ -70,20 +70,9 @@ public class TcpServer {
     public SimpleChannelInboundHandler<ByteBuf> simpleChannelInboundHandler() {
         return new SimpleChannelInboundHandler<ByteBuf>() {
             @Override
-            public void handlerAdded(ChannelHandlerContext ctx) {
-                InetSocketAddress inetSocket = (InetSocketAddress) ctx.channel().remoteAddress();
-                String ip = inetSocket.getAddress().getHostAddress();
-                int port = inetSocket.getPort();
-                log.info("有新连接注册:{}", ip + ":" + port);
-            }
-
-            @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
                 try {
-                    InetSocketAddress inetSocket = (InetSocketAddress) ctx.channel().remoteAddress();
-                    String ip = inetSocket.getAddress().getHostAddress();
-                    int port = inetSocket.getPort();
-                    customizeChannelRead(buf, ip, port);
+                    customizeChannelRead(buf);
                 } catch (Exception e) {
                     log.error("服务端处理数据异常", e);
                 }
@@ -91,25 +80,16 @@ public class TcpServer {
         };
     }
 
-    public static void main(String[] args) {
-        byte[] bytes = ByteConvertor.hexStringToByteArray("02 01 01 01 00 2e 00 05 01 21 02 01 01");
-        ByteBuf buf = Unpooled.buffer();
-        buf.writeBytes(bytes);
-
-        TcpServer tcpServer = new TcpServer();
-        tcpServer.customizeChannelRead(buf, "", 1);
-    }
-
-    private void customizeChannelRead(ByteBuf buf, String ip, int port) {
+    private void customizeChannelRead(ByteBuf buf) {
         while (buf.readableBytes() > 0) {
             byte[] bytes = new byte[buf.readableBytes()];
             buf.getBytes(buf.readerIndex(), bytes);
-//            if (buf.readableBytes() < 13) {
-//                log.info("接收到不完整消息 {}", MsgUtil.bytesToHex(bytes));
-//                return;
-//            }
+            if (buf.readableBytes() < 13) {
+                log.info("接收到不完整消息", MsgUtil.bytesToHex(bytes));
+                return;
+            }
             //测试不考虑粘包和分包
-//            log.info("接收到协议 原始数据:{}", MsgUtil.bytesToHex(bytes));
+            log.info("接收到协议 原始数据:{}", MsgUtil.bytesToHex(bytes));
 
             //标记开始位置，用于回滚消息
             buf.markReaderIndex();
@@ -127,107 +107,8 @@ public class TcpServer {
             //消息状态 todo 只处理应答消息
             byte mSt = buf.readByte();
             MsgType msgType = Cache.getInstance().parseTypeByte(mSt);
-//            byte[] bytes1 = new byte[buf.readableBytes()];
-//            buf.readBytes(bytes1);
-//            log.info("本条消息为: {} 后续字段为: {}", msgType.name(), MsgUtil.bytesToHex(bytes1));
-//            if (1 == 1) {
-//                return;
-//            }
-            switch (msgType) {
-                case CONFIRM: {
-                    //消息长度
-                    int msgLength = ((buf.readByte() << 8) & 0xFF) | ((buf.readByte()) & 0xFF);
-                    ByteBuf msgBuf = buf.readBytes(msgLength);
-                    //数据库地址长度
-                    int dataAddLength = msgBuf.readByte() & 0xFF;
-                    //数据库地址
-                    ByteBuf dataAdd = msgBuf.readBytes(dataAddLength);
-                    //消息确认状态
-                    int msgAck = msgBuf.readByte() & 0xFF;
-
-                    //下面的就是详情，如果消息确认状态的取值为 0～3、6 或者 9，则在确认消息中没有附加信息要被发送
-                    ByteBuf msgDetail = msgBuf.readBytes(msgBuf.readableBytes());
-
-                    log.info("({})本条消息为确认消息,原始数据:{} 消息长度为:{} 数据库地址长度为:{} 数据库地址为:{} 消息确认状态为:{} 消息详情为:{}",
-                        ip + ":" + port, MsgUtil.bytesToHex(bytes), msgLength,
-                        dataAddLength, MsgUtil.bytesToHex(dataAdd), msgAck, MsgUtil.bytesToHex(msgDetail));
-
-                    msgBuf.release();
-                    dataAdd.release();
-                    msgDetail.release();
-                    break;
-                }
-
-                case RESPONSE: {
-                    //消息长度
-                    int msgLength = ((buf.readByte() << 8) & 0xFF) | ((buf.readByte()) & 0xFF);
-                    ByteBuf msgBuf = buf.readBytes(msgLength);
-                    //数据库地址长度
-                    int dataAddLength = msgBuf.readByte() & 0xFF;
-                    //数据库地址
-                    ByteBuf dataAdd = msgBuf.readBytes(dataAddLength);
-
-                    //下面的就是详情，如果消息确认状态的取值为 0～3、6 或者 9，则在确认消息中没有附加信息要被发送
-                    ByteBuf msgDetail = msgBuf.readBytes(msgBuf.readableBytes());
-
-                    log.info("({})本条消息为应答消息,原始数据:{} 消息长度为:{} 数据库地址长度为:{} 数据库地址为:{} 消息详情为:{}", ip + ":" + port,
-                        MsgUtil.bytesToHex(bytes), msgLength,
-                        dataAddLength, MsgUtil.bytesToHex(dataAdd), MsgUtil.bytesToHex(msgDetail));
-
-                    msgBuf.release();
-                    dataAdd.release();
-                    msgDetail.release();
-                    break;
-                }
-                case ACTIVE_NO_ACK:{
-                    //消息长度
-                    int msgLength = ((buf.readByte() << 8) & 0xFF) | ((buf.readByte()) & 0xFF);
-                    ByteBuf msgBuf = buf.readBytes(msgLength);
-                    //数据库地址长度
-                    int dataAddLength = msgBuf.readByte() & 0xFF;
-                    //数据库地址
-                    ByteBuf dataAdd = msgBuf.readBytes(dataAddLength);
-
-                    //下面的就是详情，如果消息确认状态的取值为 0～3、6 或者 9，则在确认消息中没有附加信息要被发送
-                    ByteBuf msgDetail = msgBuf.readBytes(msgBuf.readableBytes());
-
-                    log.info("({})本条消息为不带确认的主动消息,原始数据:{} 消息长度为:{} 数据库地址长度为:{} 数据库地址为:{} 消息详情为:{}", ip + ":" + port,
-                        MsgUtil.bytesToHex(bytes), msgLength,
-                        dataAddLength, MsgUtil.bytesToHex(dataAdd), MsgUtil.bytesToHex(msgDetail));
-
-                    msgBuf.release();
-                    dataAdd.release();
-                    msgDetail.release();
-                    break;
-                }
-                case ACTIVE_WITH_ACK:{
-                    //消息长度
-                    int msgLength = ((buf.readByte() << 8) & 0xFF) | ((buf.readByte()) & 0xFF);
-                    ByteBuf msgBuf = buf.readBytes(msgLength);
-                    //数据库地址长度
-                    int dataAddLength = msgBuf.readByte() & 0xFF;
-                    //数据库地址
-                    ByteBuf dataAdd = msgBuf.readBytes(dataAddLength);
-
-                    //下面的就是详情，如果消息确认状态的取值为 0～3、6 或者 9，则在确认消息中没有附加信息要被发送
-                    ByteBuf msgDetail = msgBuf.readBytes(msgBuf.readableBytes());
-
-                    log.info("({})本条消息为需要确认的主动消息,原始数据:{} 消息长度为:{} 数据库地址长度为:{} 数据库地址为:{} 消息详情为:{}", ip + ":" + port,
-                        MsgUtil.bytesToHex(bytes), msgLength,
-                        dataAddLength, MsgUtil.bytesToHex(dataAdd), MsgUtil.bytesToHex(msgDetail));
-
-                    msgBuf.release();
-                    dataAdd.release();
-                    msgDetail.release();
-                    break;
-                }
-                default:
-                    log.info("({})未对接此消息类型{} {}", ip + ":" + port, msgType, MsgUtil.bytesToHex(bytes));
-                    return;
-            }
-
-            if (1 == 1) {
-                return;
+            if (msgType != MsgType.RESPONSE) {
+                log.info("接收到非应答消息:{}", MsgUtil.bytesToHex(bytes));
             }
 
             //消息长度
@@ -241,8 +122,8 @@ public class TcpServer {
             //消息主体(一个主体可以携带多条信息)
             ByteBuf msg = buf.readBytes(msgLength);
             try {
-//                msgHandle(msg);
-            } finally {
+                msgHandle(msg);
+            }finally {
                 msg.release();
             }
         }
@@ -375,7 +256,12 @@ public class TcpServer {
         }
         dataE.release();
     }
+
+    public static void main(String[] args) throws Exception {
+        TcpServer tcpServer = new TcpServer();
+        ByteBuf buf = Unpooled.buffer();
+        buf.writeBytes(ByteConvertor.hexStringToByteArray("01 02 03 04 00 43 00 05 01 01 03 01 01"));
+        tcpServer.customizeChannelRead(buf);
+        buf.release();
+    }
 }
-
-
-

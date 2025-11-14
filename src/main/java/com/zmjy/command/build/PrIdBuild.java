@@ -19,23 +19,23 @@ public class PrIdBuild {
      * @param prodNb 油品编码
      * @return {@link ByteBuf }
      */
-    public static ByteBuf prodNb(int node, int sNode, int prId, int prodNb) {
+    public static ByteBuf prodNb(int subNode, int node, int prId, int prodNb, MsgType msgType) {
         ByteBuf buf = Unpooled.buffer();
 
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
+        buf.writeBytes(ByteConvertor.toBin(subNode, 1));
         buf.writeBytes(ByteConvertor.toBin(node, 1));
-        buf.writeBytes(ByteConvertor.toBin(sNode, 1));
 
         //发送方逻辑节点地址：该字段为消息发送方的 LNA 2字节
-        buf.writeByte(Cache.getInstance().getLocalNode());
         buf.writeByte(Cache.getInstance().getLocalSubNode());
+        buf.writeByte(Cache.getInstance().getLocalNode());
 
         //消息代码：用于对通信层接收的数据进行过滤，固定0x00 1字节
         buf.writeByte(0x00);
 
         //消息状态字：定义消息的类型，并且包含令牌（token）1字节
-        buf.writeByte(Cache.getInstance().buildTypeByte(MsgType.WRITE));
+        buf.writeByte(Cache.getInstance().buildTypeByte(msgType));
 
         //----- 主体消息构建 start ------
         ByteBuf msg = Unpooled.buffer();
@@ -62,12 +62,6 @@ public class PrIdBuild {
 
         //将消息主体写入
         buf.writeBytes(msg);
-
-//        int length = buf.readableBytes();
-//        byte[] validBytes = new byte[length];
-//        buf.getBytes(buf.readerIndex(), validBytes);
-//        buf.release();
-//        return validBytes;
         return buf;
     }
 
@@ -80,17 +74,17 @@ public class PrIdBuild {
      * @param prodDescription 油品名称 不支持中文，只能保存两个字节，多余截断
      * @return {@link ByteBuf }
      */
-    public static ByteBuf prodDescription(int node, int sNode, int prId, String prodDescription) {
+    public static ByteBuf prodDescription(int subNode, int node, int prId, String prodDescription) {
         ByteBuf buf = Unpooled.buffer();
 
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
+        buf.writeBytes(ByteConvertor.toBin(subNode, 1));
         buf.writeBytes(ByteConvertor.toBin(node, 1));
-        buf.writeBytes(ByteConvertor.toBin(sNode, 1));
 
         //发送方逻辑节点地址：该字段为消息发送方的 LNA 2字节
-        buf.writeByte(Cache.getInstance().getLocalNode());
         buf.writeByte(Cache.getInstance().getLocalSubNode());
+        buf.writeByte(Cache.getInstance().getLocalNode());
 
         //消息代码：用于对通信层接收的数据进行过滤，固定0x00 1字节
         buf.writeByte(0x00);
@@ -123,12 +117,6 @@ public class PrIdBuild {
 
         //将消息主体写入
         buf.writeBytes(msg);
-
-//        int length = buf.readableBytes();
-//        byte[] validBytes = new byte[length];
-//        buf.getBytes(buf.readerIndex(), validBytes);
-//        buf.release();
-//        return validBytes;
         return buf;
     }
 }

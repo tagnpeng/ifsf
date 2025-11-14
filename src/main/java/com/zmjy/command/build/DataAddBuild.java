@@ -1,9 +1,12 @@
 package com.zmjy.command.build;
 
+import com.zmjy.command.MsgUtil;
 import com.zmjy.command.dto.Data;
 import com.zmjy.command.dto.enums.CDatEnums;
+import com.zmjy.command.dto.enums.ComSvEnums;
 import com.zmjy.command.dto.enums.FpIdEnums;
 import com.zmjy.command.dto.enums.FpIdLnIdEnums;
+import com.zmjy.command.dto.enums.FpIdTrDatTrSeqNbEnums;
 import com.zmjy.command.dto.enums.PrDatProdNbFmIdEnums;
 import com.zmjy.command.dto.enums.PrIdEnums;
 import com.zmjy.command.util.ByteConvertor;
@@ -15,6 +18,13 @@ import com.zmjy.command.util.ByteConvertor;
  * @date 2025/11/10
  */
 public class DataAddBuild {
+
+    public static Data ComSv(ComSvEnums comSvEnums) {
+        Data data = new Data();
+        data.setDataAdd(new byte[]{0x00});
+        data.setDataId(comSvEnums.getDataId());
+        return data;
+    }
 
     /**
      * 计算器数据库协议构建
@@ -91,6 +101,25 @@ public class DataAddBuild {
         Data data = new Data();
         data.setDataAdd(dataAdd);
         data.setDataId(prDatProdNbFmIdEnums.getDataId());
+        return data;
+    }
+
+    /**
+     * 加油模式下的油品数据库协议构建
+     *
+     * @param fpIdTrDatTrSeqNbEnums 枚举
+     * @param fpId 加油点表示
+     * @param trSeqNb 交易号
+     * @return {@link Data }
+     */
+    public static Data FpIdTrDatTrSeqNb(FpIdTrDatTrSeqNbEnums fpIdTrDatTrSeqNbEnums, int fpId, int trSeqNb) {
+        byte[] dataAdd = new byte[1 + 1 + 2];
+        System.arraycopy(ByteConvertor.toBcd(20 + fpId, 1), 0, dataAdd, 0, 1);
+        dataAdd[1] = (byte) 0x21; // 固定标识
+        System.arraycopy(ByteConvertor.toBcd(trSeqNb, 2), 0, dataAdd, 2, 2);
+        Data data = new Data();
+        data.setDataAdd(dataAdd);
+        data.setDataId(fpIdTrDatTrSeqNbEnums.getDataId());
         return data;
     }
 }

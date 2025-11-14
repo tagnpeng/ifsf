@@ -13,6 +13,18 @@
       <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
     </Console>
 
+    <!-- tcp 日志文件 -->
+    <RollingFile
+      name="TcpFile"
+      fileName="${LOG_HOME}/tcp.log"
+      filePattern="${LOG_HOME}/archive/tcp-%d{yyyy-MM-dd}.log">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %msg%n"/>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+        <SizeBasedTriggeringPolicy size="10MB"/>
+      </Policies>
+    </RollingFile>
+
     <!-- tcp-server 日志文件 -->
     <RollingFile
       name="TcpServerFile"
@@ -67,15 +79,27 @@
 
     <!-- tcp-server logger -->
     <Logger name="tcp-server" level="INFO" additivity="false">
-<!--      <AppenderRef ref="Console"/>-->
-      <AppenderRef ref="TcpServerFile"/>
+            <AppenderRef ref="Console"/>
+      <AppenderRef ref="TcpFile"/>
     </Logger>
 
     <!-- tcp-client logger -->
     <Logger name="tcp-client" level="INFO" additivity="false">
-<!--      <AppenderRef ref="Console"/>-->
-      <AppenderRef ref="TcpClientFile"/>
+      <!--      <AppenderRef ref="Console"/>-->
+      <AppenderRef ref="TcpFile"/>
     </Logger>
+
+<!--    &lt;!&ndash; tcp-server logger &ndash;&gt;-->
+<!--    <Logger name="tcp-server" level="INFO" additivity="false">-->
+<!--&lt;!&ndash;      <AppenderRef ref="Console"/>&ndash;&gt;-->
+<!--      <AppenderRef ref="TcpServerFile"/>-->
+<!--    </Logger>-->
+
+<!--    &lt;!&ndash; tcp-client logger &ndash;&gt;-->
+<!--    <Logger name="tcp-client" level="INFO" additivity="false">-->
+<!--&lt;!&ndash;      <AppenderRef ref="Console"/>&ndash;&gt;-->
+<!--      <AppenderRef ref="TcpClientFile"/>-->
+<!--    </Logger>-->
 
     <!-- upd logger -->
     <Logger name="upd" level="INFO" additivity="false">

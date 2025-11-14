@@ -2,7 +2,6 @@ package com.zmjy.command.build;
 
 import com.zmjy.command.Cache;
 import com.zmjy.command.dto.Data;
-import com.zmjy.command.dto.enums.FpIdEnums;
 import com.zmjy.command.dto.enums.FpIdLnIdEnums;
 import com.zmjy.command.dto.enums.MsgType;
 import com.zmjy.command.util.ByteConvertor;
@@ -20,23 +19,23 @@ public class FpIdLnIdBuild {
      * @param prId  油品标识(1-8)
      * @return {@link ByteBuf }
      */
-    public static ByteBuf prId(int node, int sNode, int fpId, int lnId, int prId) {
+    public static ByteBuf prId(int subNode, int node, int fpId, int lnId, int prId, MsgType msgType) {
         ByteBuf buf = Unpooled.buffer();
 
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
+        buf.writeBytes(ByteConvertor.toBin(subNode, 1));
         buf.writeBytes(ByteConvertor.toBin(node, 1));
-        buf.writeBytes(ByteConvertor.toBin(sNode, 1));
 
         //发送方逻辑节点地址：该字段为消息发送方的 LNA 2字节
-        buf.writeByte(Cache.getInstance().getLocalNode());
         buf.writeByte(Cache.getInstance().getLocalSubNode());
+        buf.writeByte(Cache.getInstance().getLocalNode());
 
         //消息代码：用于对通信层接收的数据进行过滤，固定0x00 1字节
         buf.writeByte(0x00);
 
         //消息状态字：定义消息的类型，并且包含令牌（token）1字节
-        buf.writeByte(Cache.getInstance().buildTypeByte(MsgType.WRITE));
+        buf.writeByte(Cache.getInstance().buildTypeByte(msgType));
 
         //----- 主体消息构建 start ------
         ByteBuf msg = Unpooled.buffer();
@@ -81,17 +80,17 @@ public class FpIdLnIdBuild {
      * @param gunNo 物理油枪标识(1-8)
      * @return {@link ByteBuf }
      */
-    public static ByteBuf physicalNozId(int node, int sNode, int fpId, int lnId, int gunNo) {
+    public static ByteBuf physicalNozId(int subNode, int node, int fpId, int lnId, int gunNo) {
         ByteBuf buf = Unpooled.buffer();
 
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
         //接收方逻辑节点地址：该字段为消息接收方的 LNA 2字节
+        buf.writeBytes(ByteConvertor.toBin(subNode, 1));
         buf.writeBytes(ByteConvertor.toBin(node, 1));
-        buf.writeBytes(ByteConvertor.toBin(sNode, 1));
 
         //发送方逻辑节点地址：该字段为消息发送方的 LNA 2字节
-        buf.writeByte(Cache.getInstance().getLocalNode());
         buf.writeByte(Cache.getInstance().getLocalSubNode());
+        buf.writeByte(Cache.getInstance().getLocalNode());
 
         //消息代码：用于对通信层接收的数据进行过滤，固定0x00 1字节
         buf.writeByte(0x00);

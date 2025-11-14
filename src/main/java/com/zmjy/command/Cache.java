@@ -17,12 +17,9 @@ public class Cache {
     private Boolean isInitialized = Boolean.FALSE;
     //用于构建token,线程安全的int
     private static final AtomicInteger token = new AtomicInteger(1);
-    //油机节点
-    private byte remoteNode = 1 & 0xFF;
-    private byte remoteSubNode = 11 & 0xFF;
     //本机节点
-    private byte localNode = 3 & 0xFF;
-    private byte localSubNode = 4 & 0xFF;
+    private byte localSubNode = 2 & 0xFF;
+    private byte localNode = 1 & 0xFF;
 
 
 
@@ -84,6 +81,31 @@ public class Cache {
         int value = (bits << 5) | (token & 0b11111);
 
         return (byte) (value & 0xFF);
+    }
+
+    /**
+     * 根据消息类型字节解析出 MsgType
+     */
+    public MsgType parseTypeByte(byte typeByte) {
+        // 将 byte 转为无符号 int
+        int bits = (typeByte >> 5) & 0b111;
+
+        switch (bits) {
+            case 0b000:
+                return MsgType.READ;
+            case 0b001:
+                return MsgType.RESPONSE;
+            case 0b010:
+                return MsgType.WRITE;
+            case 0b011:
+                return MsgType.ACTIVE_WITH_ACK;
+            case 0b100:
+                return MsgType.ACTIVE_NO_ACK;
+            case 0b111:
+                return MsgType.CONFIRM;
+            default:
+                throw new IllegalArgumentException("未知消息类型 bits: " + bits);
+        }
     }
 
 }

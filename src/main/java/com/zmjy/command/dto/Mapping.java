@@ -13,13 +13,13 @@ public class Mapping {
      */
     private String ip;
     /**
-     * 节点号(NODE:1-9)
-     */
-    private Integer node;
-    /**
      * 子节点号(S_NODE:1-9)
      */
     private Integer subNode;
+    /**
+     * 节点号(NODE:1-9)
+     */
+    private Integer node;
     /**
      * 加油点(FP:1-4)
      */
@@ -36,6 +36,10 @@ public class Mapping {
      * 物理油枪号(1-8)
      */
     private Integer gunNo;
+    /**
+     * 第三方油品id(1-8)
+     */
+    private Integer prId;
     /**
      * 第三方油品编码（1-99999999）
      */

@@ -11,6 +11,8 @@ public enum CDatEnums {
     Nb_FP((byte) 0x05),
     //加油机是否可在自主加油模式中工作
     Stand_Alone_Auth((byte) 0x0C),
+    //FP 是否允许预授权状态，默认值为 1
+    Auth_State_Mode((byte) 0x0B),
     ;
 
     @Getter
