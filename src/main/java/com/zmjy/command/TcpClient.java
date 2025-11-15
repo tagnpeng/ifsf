@@ -54,7 +54,6 @@ public class TcpClient {
         bootstrap.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true).handler(new ChannelInitializer<Channel>() {
             @Override
             protected void initChannel(Channel ch) {
-                ch.pipeline().addLast(new Handle());
             }
         });
         ChannelFuture future = bootstrap.connect(ip, port);
@@ -73,13 +72,6 @@ public class TcpClient {
         }
     }
 
-    public class Handle extends ChannelInboundHandlerAdapter {
-        @Override
-        public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            log.info("接收到主动数据:{}", MsgUtil.bytesToHex((ByteBuf) msg));
-            super.channelRead(ctx, msg);
-        }
-    }
 
     /**
      * 发送入口：所有 send() 都只是放入队列，不直接发

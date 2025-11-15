@@ -20,6 +20,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +60,7 @@ public class TcpServer {
             throw new RuntimeException("tcp-server服务连接超时");
         } else {
             if (future.isSuccess()) {
-                log.info("服务启动成功");
+                log.info("服务启动成功{}", localIp + ":" + port);
                 channel = future.channel();
             } else {
                 log.info("服务启动失败", future.cause());
@@ -67,12 +69,16 @@ public class TcpServer {
         }
     }
 
-    public SimpleChannelInboundHandler<ByteBuf> simpleChannelInboundHandler() {
-        return new SimpleChannelInboundHandler<ByteBuf>() {
+    public ByteToMessageDecoder simpleChannelInboundHandler() {
+        return new ByteToMessageDecoder() {
             @Override
-            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
+            protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf buf, List<Object> list) throws Exception {
                 try {
-                    customizeChannelRead(buf);
+                    byte[] bytes = new byte[buf.readableBytes()];
+                    buf.getBytes(buf.readerIndex(), bytes);
+                    log.info("接收到协议 原始数据:{}", MsgUtil.bytesToHex(bytes));
+                    buf.readByte();
+//                    buf.release();
                 } catch (Exception e) {
                     log.error("服务端处理数据异常", e);
                 }
@@ -259,9 +265,10 @@ public class TcpServer {
 
     public static void main(String[] args) throws Exception {
         TcpServer tcpServer = new TcpServer();
-        ByteBuf buf = Unpooled.buffer();
-        buf.writeBytes(ByteConvertor.hexStringToByteArray("01 02 03 04 00 43 00 05 01 01 03 01 01"));
-        tcpServer.customizeChannelRead(buf);
-        buf.release();
+        tcpServer.tpcServer("192.168.22.64", 8080);
+//        ByteBuf buf = Unpooled.buffer();
+//        buf.writeBytes(ByteConvertor.hexStringToByteArray("01 02 03 04 00 43 00 05 01 01 03 01 01"));
+//        tcpServer.customizeChannelRead(buf);
+//        buf.release();
     }
 }

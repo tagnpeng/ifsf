@@ -19,7 +19,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.unix.Buffer;
+import io.netty.handler.codec.ByteToMessageDecoder;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -67,18 +69,10 @@ public class TcpServer {
         }
     }
 
-    public SimpleChannelInboundHandler<ByteBuf> simpleChannelInboundHandler() {
-        return new SimpleChannelInboundHandler<ByteBuf>() {
+    public ByteToMessageDecoder simpleChannelInboundHandler() {
+        return new ByteToMessageDecoder() {
             @Override
-            public void handlerAdded(ChannelHandlerContext ctx) {
-                InetSocketAddress inetSocket = (InetSocketAddress) ctx.channel().remoteAddress();
-                String ip = inetSocket.getAddress().getHostAddress();
-                int port = inetSocket.getPort();
-                log.info("有新连接注册:{}", ip + ":" + port);
-            }
-
-            @Override
-            protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) {
+            protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> list) throws Exception {
                 try {
                     InetSocketAddress inetSocket = (InetSocketAddress) ctx.channel().remoteAddress();
                     String ip = inetSocket.getAddress().getHostAddress();
@@ -88,6 +82,15 @@ public class TcpServer {
                     log.error("服务端处理数据异常", e);
                 }
             }
+
+            @Override
+            public void handlerAdded(ChannelHandlerContext ctx) {
+                InetSocketAddress inetSocket = (InetSocketAddress) ctx.channel().remoteAddress();
+                String ip = inetSocket.getAddress().getHostAddress();
+                int port = inetSocket.getPort();
+                log.info("有新连接注册:{}", ip + ":" + port);
+            }
+
         };
     }
 
