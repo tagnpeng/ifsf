@@ -18,7 +18,7 @@ public class Cache {
     //用于构建token,线程安全的int
     private static final AtomicInteger token = new AtomicInteger(1);
     //本机节点
-    private byte localSubNode = 2 & 0xFF;
+    private byte localSubNode = 3 & 0xFF;
     private byte localNode = 1 & 0xFF;
 
 

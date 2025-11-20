@@ -57,7 +57,7 @@ public class TcpClient {
             }
         });
         ChannelFuture future = bootstrap.connect(ip, port);
-        boolean success = future.await(3, TimeUnit.SECONDS);
+        boolean success = future.await(10, TimeUnit.SECONDS);
         if (!success) {
             log.info("服务连接{}超时", ip + ":" + port);
             throw new RuntimeException("tcp-client服务连接超时");

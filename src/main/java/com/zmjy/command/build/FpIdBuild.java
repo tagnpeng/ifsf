@@ -49,7 +49,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = ByteConvertor.toBin(num, 1);
@@ -110,7 +110,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = new byte[] {Cache.getInstance().getLocalSubNode(), Cache.getInstance().getLocalNode()};
@@ -169,7 +169,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = new byte[] {0x00};
@@ -228,7 +228,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = new byte[] {0x00};
@@ -287,7 +287,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = ByteConvertor.toBin(fmId, 1);
@@ -349,7 +349,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = new byte[1];
@@ -414,7 +414,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
         //----- 主体消息构建 end ------
 
         //消息长度：用于指明消息的字节数（数据库、数据）2字节
@@ -464,7 +464,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
         //----- 主体消息构建 end ------
 
         //消息长度：用于指明消息的字节数（数据库、数据）2字节
@@ -514,7 +514,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = new byte[]{0x00};
@@ -570,14 +570,14 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
-        byte[] bytes = ByteConvertor.toBcd(1, 2);
-        msg.writeBytes(ByteConvertor.toBin(bytes.length, 1));
+//        byte[] bytes = ByteConvertor.toBcd(1, 2);
+//        msg.writeBytes(ByteConvertor.toBin(bytes.length, 1));
 
         //数据元素 n字节
-        msg.writeBytes(bytes);
+//        msg.writeBytes(bytes);
         //----- 主体消息构建 end ------
 
         //消息长度：用于指明消息的字节数（数据库、数据）2字节
@@ -628,7 +628,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = ByteConvertor.toBin(5, 1);
@@ -686,7 +686,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = new byte[]{Cache.getInstance().getLocalSubNode(), Cache.getInstance().getLocalNode()};
@@ -744,7 +744,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = ByteConvertor.toBcd(num, 2);
@@ -801,7 +801,7 @@ public class FpIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
 //        byte[] bytes = ByteConvertor.toBcd(num, 2);

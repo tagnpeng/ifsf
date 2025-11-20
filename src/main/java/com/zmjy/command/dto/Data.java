@@ -10,7 +10,7 @@ public class Data {
     /**
      * 数据编号
      */
-    private byte dataId;
+    private byte[] dataId;
 
     //获取数据库地址长度
     public byte getDataAddLength() {

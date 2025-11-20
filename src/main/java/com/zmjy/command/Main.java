@@ -36,7 +36,7 @@ public class Main {
 
     //本机ip
     @Getter
-    private static final String localIp = "192.168.4.64";
+    private static final String localIp = "192.168.4.66";
     //updIp
     private static final String updIp = "0.0.0.0";
     //upd端口

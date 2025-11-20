@@ -47,7 +47,7 @@ public class FpIdLnIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = ByteConvertor.toBin(prId, 1);
@@ -108,7 +108,7 @@ public class FpIdLnIdBuild {
         msg.writeBytes(data.getDataAdd());
 
         //数据标识符：应用数据元素的标识符 1字节
-        msg.writeByte(data.getDataId());
+        msg.writeBytes(data.getDataId());
 
         //数据长度：应用数据元素的长度。如果数据元素的长度大于 254 字节，那么 Data_Lg 将取值 255，并且之后的 2 个字节指明了数据长度 1或者3字节
         byte[] bytes = ByteConvertor.toBin(gunNo, 1);

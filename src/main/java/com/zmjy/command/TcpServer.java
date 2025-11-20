@@ -95,7 +95,7 @@ public class TcpServer {
     }
 
     public static void main(String[] args) {
-        byte[] bytes = ByteConvertor.hexStringToByteArray("02 01 01 01 00 2e 00 05 01 21 02 01 01");
+        byte[] bytes = ByteConvertor.hexStringToByteArray("03 01 01 01 00 FB 00 06 04 21 20 00 00 00");
         ByteBuf buf = Unpooled.buffer();
         buf.writeBytes(bytes);
 
